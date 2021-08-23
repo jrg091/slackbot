@@ -1,5 +1,6 @@
 package com.xmartlabs.slackbot.data.sources.serializer
 
+import com.xmartlabs.slackbot.logger
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -19,5 +20,11 @@ object TogglBambooDateSerializer : KSerializer<LocalDate> {
     override fun serialize(encoder: Encoder, value: LocalDate) =
         encoder.encodeString(value.format(formatter))
 
-    override fun deserialize(decoder: Decoder): LocalDate = LocalDate.parse(decoder.decodeString(), formatter)
+    override fun deserialize(decoder: Decoder): LocalDate {
+        val dateAsString = decoder.decodeString()
+        return kotlin.runCatching { LocalDate.parse(dateAsString, formatter) }
+            .onFailure { logger.warn("Invalid date, $dateAsString") }
+            .getOrNull()
+            ?: LocalDate.MIN
+    }
 }

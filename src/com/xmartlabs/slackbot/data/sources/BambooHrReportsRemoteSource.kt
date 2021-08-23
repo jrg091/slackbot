@@ -31,8 +31,15 @@ object BambooHrReportsRemoteSource {
                             workingHours
                         }
                     }
-                if (directoryUser.workEmail == null || workingHours == null) {
-                    logger.warn("Invalid user, user: $directoryUser, workingHours: $workingHours")
+                if (directoryUser.workEmail == null ||
+                    workingHours == null ||
+                    userExtraFields.hireDate == LocalDate.MIN
+                ) {
+                    logger.warn(
+                        "Invalid user, user: $directoryUser, " +
+                                "workingHours: $workingHours, " +
+                                "hireDate: ${userExtraFields.hireDate}"
+                    )
                     null
                 } else {
                     BambooUser(

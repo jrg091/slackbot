@@ -148,9 +148,9 @@ object WorkTimeReportManager {
                 }
             }.map { (user, timeOffs) ->
                 val fromWorkingDate = max(from, user.hireDate)
-                val workingDates = if (fromWorkingDate.isAfter(to)) 0 else workingDates(fromWorkingDate, to)
+                val workingDays = if (fromWorkingDate.isAfter(to)) 0 else workingDates(fromWorkingDate, to)
 
-                val timeOffDates = timeOffs
+                val daysOff = timeOffs
                     .flatMap { max(it.start, fromWorkingDate).datesUntil(min(it.end.plusDays(1), to)).toList() }
                     .distinct()
                     .filter { !it.isBefore(user.hireDate) }
@@ -158,8 +158,9 @@ object WorkTimeReportManager {
                 BambooWorkTimeReport(
                     bambooUser = user,
                     workingTime = Duration.ofHours(
-                        (workingDates - timeOffDates) * user.workingHours / Config.WORK_DAYS
+                        (workingDays - daysOff) * user.workingHours / Config.WORK_DAYS
                     ),
+                    daysOff = daysOff,
                 )
             }.also { logger.info("Bamboo report $it") }
     }
@@ -218,6 +219,9 @@ object WorkTimeReportManager {
             when (reportSort) {
                 ReportSort.TIME -> entries.sortedBy { it.togglReport.duration(reportType) }
                 ReportSort.ALPHA -> entries.sortedBy { it.togglReport.togglUser.name }
+                ReportSort.WORK_DIFFERENCE -> entries.sortedBy {
+                    it.workDifference ?: Duration.ofMillis(-Long.MAX_VALUE)
+                }
             }
         }
         .formatReports(reportType, csv = true)
@@ -225,26 +229,28 @@ object WorkTimeReportManager {
 
 private fun List<UserWorkTimeReport<*>>.formatReports(reportType: ReportType, csv: Boolean): String {
     val header = when {
-        csv && reportType == ReportType.WORKED_HOURS -> "User Name, Worked Time, Worked difference\n"
+        csv && reportType == ReportType.WORKED_HOURS ->
+            "User Name, Worked Time (hh:mm), Worked difference (hh:mm), Days Off\n"
         csv && reportType == ReportType.WRONG_TRACKED_ENTRIES_TIME ->
-            "User Name, Invalid Worked Time, Worked difference\n"
+            "User Name, Invalid Worked Time (hh:mm)\n"
         else -> ""
     }
 
     return header + joinToString("\n") { entry ->
         val workTime = entry.togglReport.duration(reportType)
-        val workDifference = entry.bambooReport
-            ?.workingTime
-            ?.let { workTime - it }
-            ?.toHourMinuteFormat()
-            ?: "undefined"
+        val workDifference = entry.workDifference?.toHourMinuteFormat() ?: "undefined"
         val start = if (csv) "" else "   • "
+        val daysOff = when (val daysOff = entry.bambooReport?.daysOff) {
+            null -> "undefined"
+            0 -> ""
+            else -> daysOff
+        }
         when (reportType) {
             ReportType.WORKED_HOURS ->
-                "$start${entry.togglReport.togglUser.name}, ${workTime.toHourMinuteFormat()}, $workDifference"
+                "$start${entry.togglReport.togglUser.name}, ${workTime.toHourMinuteFormat()}, $workDifference, $daysOff"
             ReportType.WRONG_TRACKED_ENTRIES_TIME ->
                 "$start${entry.togglReport.togglUser.name}, ${workTime.toHourMinuteFormat()}"
-        }
+        }.trim()
     }
 }
 
@@ -256,6 +262,7 @@ enum class ReportPeriodType {
 enum class ReportSort {
     ALPHA,
     TIME,
+    WORK_DIFFERENCE,
 }
 
 enum class ReportType {
@@ -279,3 +286,11 @@ private class UserWorkTimeReport<ToggleReport : TogglUserEntryReport>(
     val togglReport: ToggleReport,
     val bambooReport: BambooWorkTimeReport?,
 )
+
+private val UserWorkTimeReport<*>.workDifference: Duration?
+    get() {
+        val workTime = togglReport.workTime
+        return bambooReport
+            ?.workingTime
+            ?.let { workTime - it }
+    }

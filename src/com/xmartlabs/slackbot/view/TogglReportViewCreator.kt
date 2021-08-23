@@ -72,14 +72,13 @@ object TogglReportViewCreator {
                         value(ReportSort.ALPHA.name)
                     }
                     options {
-                        option {
-                            plainText("Alphabetical")
-                            value(ReportSort.ALPHA.name)
-                        }
-                        option {
-                            plainText("Time")
-                            value(ReportSort.TIME.name)
-                        }
+                        ReportSort.values()
+                            .forEach { sort ->
+                                option {
+                                    plainText(sort.prettyName)
+                                    value(sort.name)
+                                }
+                            }
                     }
                 }
             }
@@ -148,3 +147,10 @@ object TogglReportViewCreator {
         )
     }
 }
+
+private val ReportSort.prettyName: String
+    get() = when (this) {
+        ReportSort.ALPHA -> "Alphabetical"
+        ReportSort.TIME -> "Work time"
+        ReportSort.WORK_DIFFERENCE -> "Work difference"
+    }

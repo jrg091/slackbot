@@ -50,7 +50,7 @@ class RemindInvalidEntryTogglUseCase : CoroutineUseCase {
             LocalDate.now()
                 .withDayOfMonth(1)
         } else {
-            to.minusDays(Config.TOGGL_WEEKLY_REPORT_DAYS_TO_CHECK.toLong())
+            to.minusDays((Config.TOGGL_WEEKLY_REPORT_DAYS_TO_CHECK.toLong() - 1).coerceAtLeast(0))
         }
 
     private fun durationToNextReminder(): Duration =

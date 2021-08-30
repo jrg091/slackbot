@@ -190,7 +190,7 @@ object CommandManager {
         ) { _, _ ->
             """
                Hey, thanks for sharing your feedback! :muscle:
-               If you want to propose a new feature you can open a <https://github.com/xmartlabs/slackbot/discussions | GitHub Discussion> or an <https://github.com/xmartlabs/slackbot/issues | issue>.
+               If you want to propose a new feature you can post a message in <#${Config.BOT_FEEDBACK_CHANNEL_ID}>, open a <https://github.com/xmartlabs/slackbot/discussions | GitHub Discussion> or an <https://github.com/xmartlabs/slackbot/issues | issue>.
 
                All contributions are welcome! :github:
             """.trimIndent()

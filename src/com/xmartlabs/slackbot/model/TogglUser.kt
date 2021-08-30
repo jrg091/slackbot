@@ -29,5 +29,5 @@ data class TogglUser(
     @SerialName("user_id")
     val userId: Long,
     @SerialName("workspace_id")
-    val workspaceId: Int,
+    val workspaceId: Long,
 )

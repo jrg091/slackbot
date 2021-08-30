@@ -19,6 +19,6 @@ data class ToggleSummaryGroup(
 data class ToggleSummarySubGroup(
     val id: String? = null,
     val title: String? = null,
-    val seconds: Int?,
-    val ids: List<Int>?,
+    val seconds: Long?,
+    val ids: List<Long>?,
 )

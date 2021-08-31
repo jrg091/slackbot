@@ -52,12 +52,10 @@ object Config {
         System.getenv("TOGGLE_WEEKLY_REPORT_EXCLUDE_CURRENT_WEEK")?.toBoolean() ?: true
     val TOGGL_WEEKLY_REPORT_MIN_UNTRACKED_DURATION_TO_NOTIFY: Duration =
         (System.getenv("TOGGL_MIN_WEEKLY_UNTRACKED_DURATION_TO_NOTIFY") ?: "00:10:00")
-            .let { minDurationTime ->
-                Duration.between(
-                    LocalTime.MIN,
-                    LocalTime.parse(minDurationTime)
-                )
-            }
+            .toDuration()
+    val TOGGL_MONTHLY_REPORT_MIN_UNTRACKED_DURATION_TO_NOTIFY: Duration =
+        (System.getenv("TOGGL_MONTHLY_REPORT_MIN_UNTRACKED_DURATION_TO_NOTIFY") ?: "00:10:00")
+            .toDuration()
 
     init {
         // Check slack keys
@@ -68,4 +66,9 @@ object Config {
             "SLACK_SIGNING_SECRET is missing"
         }
     }
+
+    private fun String.toDuration() = Duration.between(
+        LocalTime.MIN,
+        LocalTime.parse(this)
+    )
 }

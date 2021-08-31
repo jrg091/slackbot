@@ -77,9 +77,11 @@ object WorkTimeReportManager {
         logger.info("Fetch toggl entries from: $from to $to")
         generateWorkTimeReport<FullTogglUserEntryReport>(from, to)
             .filter { report ->
-                reportType == ReportPeriodType.MONTHLY ||
-                        report.togglReport.wrongFormatTrackedTime >=
-                        Config.TOGGL_WEEKLY_REPORT_MIN_UNTRACKED_DURATION_TO_NOTIFY
+                val minDurationToNotify = when (reportType) {
+                    ReportPeriodType.MONTHLY -> Config.TOGGL_MONTHLY_REPORT_MIN_UNTRACKED_DURATION_TO_NOTIFY
+                    ReportPeriodType.WEEKLY -> Config.TOGGL_WEEKLY_REPORT_MIN_UNTRACKED_DURATION_TO_NOTIFY
+                }
+                report.togglReport.wrongFormatTrackedTime > minDurationToNotify
             }
             .onEach { report -> sendDMessageToUser(report.slackUser, report.togglReport, from, to) }
             .also { entries -> sendReportSummaryMessage(entries, now, from, to) }

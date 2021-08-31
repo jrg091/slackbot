@@ -20,7 +20,7 @@ data class FullTogglUserEntryReport(
     override val workTime: Duration = Duration.ofMillis(entries.sumOf { it.duration })
 }
 
-class SimpleTogglUserEntryReport(
+data class SimpleTogglUserEntryReport(
     override val togglUser: TogglUser,
     override val reportUrl: String,
     override val workTime: Duration,

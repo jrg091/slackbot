@@ -20,16 +20,17 @@ object MessageManager {
         val peopleWithSpace = if (joinedIds.isNullOrBlank()) "" else "$joinedIds "
         return """
 
-                ${peopleWithSpace}Welcome to Xmartlabs!:wave: :xl: We are very happy for having you onboard :muscle::muscle::muscle:  
+                :agite-izq: *Team, say hi to our new team member!* :agite:
+                 ${peopleWithSpace}Hi, welcome to Xmartlabs! :wave: :xl: We are very happy for having you onboard, our entire team is here to help you with whatever you need :muscle:
 
-                <https://www.notion.so/xmartlabs/Onboarding-c092b413380341948aabffa17bd85647 | Go to the Onboarding to know which are your next steps!>                  
-                    
+                To know what your next steps are, <https://www.notion.so/xmartlabs/Onboarding-c092b413380341948aabffa17bd85647 | go to the onboarding page> :notion-logo:
+
                 Additionally, please: 
                 • Add a Profile picture to Slack & Bamboo :camera: :star: 
                 • <https://www.notion.so/xmartlabs/Setup-Calendars-URLs-40a4c5506a03429dbdccea169646a8a3 | Add calendar URLs :calendar:>
                 • Shot :absenta: (in next XL after)
                 
-                Regards <@$xlBotUserId> :slack:
+                Regards <@$xlBotUserId>
                 """.trimIndent()
     }
 

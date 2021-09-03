@@ -1,5 +1,5 @@
 package com.xmartlabs.slackbot.usecases
 
-interface CoroutineUseCase {
-    suspend fun execute()
+interface CoroutineUseCase<P> {
+    suspend fun execute(param: P)
 }

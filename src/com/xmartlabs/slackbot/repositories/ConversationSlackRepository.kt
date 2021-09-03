@@ -18,6 +18,8 @@ object ConversationSlackRepository : SlackEntityRepository<Conversation>() {
 
     fun getChannel(channelId: String) = getEntity { it.id == channelId }
 
+    fun getChannels() = getEntities()
+
     suspend fun sendMessage(channelId: String, text: String, blocks: List<LayoutBlock>? = null) =
         ConversationSlackRemoteSource.sendMessage(channelId, text, blocks)
 

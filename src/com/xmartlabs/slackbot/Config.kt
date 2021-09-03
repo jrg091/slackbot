@@ -28,7 +28,9 @@ object Config {
     val ANNOUNCEMENTS_ENABLED = System.getenv("ANNOUNCEMENTS_ENABLED")?.toBoolean() ?: false
     val ANNOUNCEMENTS_PROTECTED_FEATURE = System.getenv("ANNOUNCEMENTS_PROTECTED_FEATURE")?.toBoolean() ?: true
 
-    val WELCOME_CHANNEL = System.getenv("WELCOME_CHANNEL_NAME") ?: "announcements"
+    val WELCOME_CHANNEL_ID = System.getenv("WELCOME_CHANNEL_ID") ?: "CD2S06D62"
+    val WELCOME_MESSAGE_DELAY: Duration = (System.getenv("WELCOME_MESSAGE_DELAY") ?: "00:15:00")
+        .toDuration()
 
     val TOGGL_REPORTS_ENABLED = System.getenv("TOGGL_REPORTS_ENABLED")?.toBoolean() ?: false
     val TOGGL_XL_ORGANIZATION = System.getenv("TOGGL_XL_ORGANIZATION")?.toLong() ?: -1

@@ -58,7 +58,7 @@ fun prefetchData() {
 fun setupTooglReminders() {
     if (Config.TOGGL_REPORTS_ENABLED) {
         GlobalScope.launch(Dispatchers.IO) {
-            kotlin.runCatching { RemindInvalidEntryTogglUseCase().execute() }
+            kotlin.runCatching { RemindInvalidEntryTogglUseCase().execute(RemindInvalidEntryTogglUseCase.Param) }
                 .onFailure { logger.error("Error sending toggl reminders", it) }
         }
     } else {

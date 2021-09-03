@@ -20,8 +20,8 @@ object MessageManager {
         val peopleWithSpace = if (joinedIds.isNullOrBlank()) "" else "$joinedIds "
         return """
 
-                :agite-izq: *Team, say hi to our new team member!* :agite:
-                 ${peopleWithSpace}Hi, welcome to Xmartlabs! :wave: :xl: We are very happy for having you onboard, our entire team is here to help you with whatever you need :muscle:
+                :agite-izq: *Team, say hi to our new team member${if ((newMembersIds?.size ?: 0) > 1) "s" else ""}!* :agite:
+                 ${peopleWithSpace}Hi, welcome to Xmartlabs! :wave: :xl: We are very happy for having you on board, our entire team is here to help you with whatever you need :muscle:
 
                 To know what your next steps are, <https://www.notion.so/xmartlabs/Onboarding-c092b413380341948aabffa17bd85647 | go to the onboarding page> :notion-logo:
 

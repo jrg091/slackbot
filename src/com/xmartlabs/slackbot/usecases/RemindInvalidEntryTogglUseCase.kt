@@ -18,8 +18,10 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
 @OptIn(ExperimentalTime::class)
-class RemindInvalidEntryTogglUseCase : CoroutineUseCase {
-    override suspend fun execute() = withContext(Dispatchers.IO) {
+class RemindInvalidEntryTogglUseCase : CoroutineUseCase<RemindInvalidEntryTogglUseCase.Param> {
+    object Param
+
+    override suspend fun execute(param: Param) = withContext(Dispatchers.IO) {
         while (true) {
             val nextReview = durationToNextReminder()
             logger.info("Toogle automatically report will be checked in ${nextReview.toKotlinDuration()})")

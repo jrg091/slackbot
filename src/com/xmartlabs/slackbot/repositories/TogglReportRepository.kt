@@ -34,9 +34,17 @@ object TogglReportRepository {
                 .map { (id, entries) ->
                     val user = togglUsers[id]!!
                     FullTogglUserEntryReport(
-                        user,
-                        entries,
-                        TogglReportsRemoteSource.generateReportUrl(user, since.toLocalDate(), until.toLocalDate())
+                        togglUser = user,
+                        entries = entries,
+                        reportUrl = TogglReportsRemoteSource.generateReportUrl(
+                            user, since.toLocalDate(), until.toLocalDate()
+                        ),
+                        reportInvalidEntryDescriptionsUrl = TogglReportsRemoteSource.generateReportUrl(
+                            user, since.toLocalDate(), until.toLocalDate(), filterInvalidDescriptions = true
+                        ),
+                        reportInvalidProjectsUrl = TogglReportsRemoteSource.generateReportUrl(
+                            user, since.toLocalDate(), until.toLocalDate(), filterInvalidProjects = true
+                        ),
                     )
                 }
         }.onFailure { logger.error("Error fetching toggl data", it) }

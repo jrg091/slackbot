@@ -2,6 +2,9 @@ package com.xmartlabs.slackbot.manager
 
 import com.xmartlabs.slackbot.extensions.isLastWorkingDayOfTheMonth
 import com.xmartlabs.slackbot.extensions.toPrettyString
+import com.xmartlabs.slackbot.model.FullTogglUserEntryReport
+import com.xmartlabs.slackbot.model.ReportErrorType
+import org.atteo.evo.inflector.English
 import java.time.Duration
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -20,7 +23,7 @@ object MessageManager {
         val peopleWithSpace = if (joinedIds.isNullOrBlank()) "" else "$joinedIds "
         return """
 
-                :agite-izq: *Team, say hi to our new team member${if ((newMembersIds?.size ?: 0) > 1) "s" else ""}!* :agite:
+                :agite-izq: *Team, say hi to our new team ${English.plural("member", newMembersIds?.size ?: 0)}!* :agite:
                  ${peopleWithSpace}Hi, welcome to Xmartlabs! :wave: :xl: We are very happy for having you on board, our entire team is here to help you with whatever you need :muscle:
 
                 To know what your next steps are, <https://www.notion.so/xmartlabs/Onboarding-c092b413380341948aabffa17bd85647 | go to the onboarding page> :notion-logo:
@@ -39,11 +42,25 @@ object MessageManager {
         untrackedTime: Duration,
         from: LocalDate,
         to: LocalDate,
-        reportUrl: String,
+        report: FullTogglUserEntryReport,
     ) = if (to.isLastWorkingDayOfTheMonth()) {
-        getInvalidTogglEntriesMonthlyMessage(userId, untrackedTime, from, to, reportUrl)
+        getInvalidTogglEntriesMonthlyMessage(userId, untrackedTime, from, to, report)
     } else {
-        getInvalidTogglEntriesWeeklyMessage(userId, untrackedTime, from, to, reportUrl)
+        getInvalidTogglEntriesWeeklyMessage(userId, untrackedTime, from, to, report)
+    }
+
+    private fun getReportUrlMessage(report: FullTogglUserEntryReport): String {
+        val templateMessage = "Please, take a look at <%s | yours entries>."
+        return when (report.reportErrorType) {
+            ReportErrorType.ENTRIES_WITH_INVALID_PROJECT -> templateMessage.format(report.reportInvalidProjectsUrl)
+            ReportErrorType.ENTRIES_WITH_INVALID_DESCRIPTION ->
+                templateMessage.format(report.reportInvalidEntryDescriptionsUrl)
+            ReportErrorType.ENTRIES_WITH_INVALID_PROJECT_AND_DESCRIPTION ->
+                "Please, take a look at your " +
+                        "<${report.reportInvalidEntryDescriptionsUrl} | entries without description> and your " +
+                        "<${report.reportInvalidProjectsUrl} | entries without project>."
+            null -> templateMessage.format(report.reportUrl)
+        }
     }
 
     private fun getInvalidTogglEntriesWeeklyMessage(
@@ -51,12 +68,12 @@ object MessageManager {
         untrackedTime: Duration,
         from: LocalDate,
         to: LocalDate,
-        reportUrl: String,
+        report: FullTogglUserEntryReport,
     ) = """
-        Hi <@$userId>, you have *${untrackedTime.toPrettyString()}* tracked toggl entries with an invalid format (no project assigned or an empty description).
+        Hi <@$userId>, you have *${report.wrongFormatEntries.size} tracked toggl ${English.plural("entry", report.wrongFormatEntries.size)} (${untrackedTime.toPrettyString()})* with an invalid format (no project assigned or an empty description).
         Report generated from ${from.format(LOCAL_DATE_FORMATTER)} to ${to.format(LOCAL_DATE_FORMATTER)}.
         It's important to keep your toggl up to date.
-        Please, take a look at <$reportUrl | yours entries>. 
+        ${getReportUrlMessage(report)}
         
         If you have any questions, you can use `/xlbot toggl` slack command.
     """.trimIndent()
@@ -66,13 +83,13 @@ object MessageManager {
         untrackedTime: Duration,
         from: LocalDate,
         to: LocalDate,
-        reportUrl: String,
+        report: FullTogglUserEntryReport,
     ) = """
         :warning::warning::warning:
-        Hi <@$userId>, *we're closing the month* and you have *${untrackedTime.toPrettyString()}* tracked toggl entries with an invalid format (no project assigned or an empty description).
+        Hi <@$userId>, *we're closing the month* and you have *${report.wrongFormatEntries.size} tracked toggl ${English.plural("entry", report.wrongFormatEntries.size)} (${untrackedTime.toPrettyString()})* with an invalid format (no project assigned or an empty description).
         Report generated from ${from.format(LOCAL_DATE_FORMATTER)} to ${to.format(LOCAL_DATE_FORMATTER)}.
         It's important to keep your toggl up to date.
-        Please, take a look at <$reportUrl | yours entries>. 
+        ${getReportUrlMessage(report)}
         
         If you have any questions, you can use `/xlbot toggl` slack command.
     """.trimIndent()

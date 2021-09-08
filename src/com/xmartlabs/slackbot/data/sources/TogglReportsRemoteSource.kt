@@ -9,11 +9,18 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 object TogglReportsRemoteSource {
-    fun generateReportUrl(togglUser: TogglUser, from: LocalDate, to: LocalDate) =
-        "https://track.toggl.com/reports/summary/${Config.TOGGL_XL_WORKSPACE}" +
-                "/from/${from.toTogglApiFormat()}" +
-                "/to/${to.toTogglApiFormat()}" +
-                "/users/${togglUser.userId}"
+    fun generateReportUrl(
+        togglUser: TogglUser,
+        from: LocalDate,
+        to: LocalDate,
+        filterInvalidProjects: Boolean = false,
+        filterInvalidDescriptions: Boolean = false,
+    ) = "https://track.toggl.com/reports/detailed/${Config.TOGGL_XL_WORKSPACE}" +
+            (if (filterInvalidDescriptions) "/description/0" else "") +
+            "/from/${from.toTogglApiFormat()}" +
+            (if (filterInvalidProjects) "/projects/0" else "") +
+            "/to/${to.toTogglApiFormat()}" +
+            "/users/${togglUser.userId}"
 
     fun getTasks(since: LocalDateTime, until: LocalDateTime): List<TimeEntry> {
         val userWithoutProjects = TogglApi.togglReportApi.detailed()

@@ -13,11 +13,28 @@ data class FullTogglUserEntryReport(
     override val togglUser: TogglUser,
     val entries: List<TimeEntry>,
     override val reportUrl: String,
+    val reportInvalidProjectsUrl: String,
+    val reportInvalidEntryDescriptionsUrl: String,
 ) : TogglUserEntryReport {
-    private val wrongFormatEntries: List<TimeEntry> =
+    val wrongFormatEntries: List<TimeEntry> =
         entries.filter { (it.projectId ?: 0L) == 0L || it.description.isNullOrBlank() }
     val wrongFormatTrackedTime: Duration = Duration.ofMillis(wrongFormatEntries.sumOf { it.duration })
     override val workTime: Duration = Duration.ofMillis(entries.sumOf { it.duration })
+
+    val reportErrorType: ReportErrorType? by lazy {
+        val entriesWithWrongProject = wrongFormatEntries.filter { (it.projectId ?: 0L) == 0L }.toSet()
+        val entriesWithWrongDescription = wrongFormatEntries.filter { it.description.isNullOrBlank() }.toSet()
+        when {
+            entriesWithWrongProject.isEmpty() && entriesWithWrongDescription.isEmpty() -> null
+            entriesWithWrongProject.isNotEmpty() && (entriesWithWrongDescription.isEmpty() ||
+                    entriesWithWrongDescription.all { timeEntry -> timeEntry in entriesWithWrongProject }) ->
+                ReportErrorType.ENTRIES_WITH_INVALID_PROJECT
+            entriesWithWrongDescription.isNotEmpty() && (entriesWithWrongProject.isEmpty() ||
+                    entriesWithWrongProject.all { timeEntry -> timeEntry in entriesWithWrongDescription }) ->
+                ReportErrorType.ENTRIES_WITH_INVALID_DESCRIPTION
+            else -> ReportErrorType.ENTRIES_WITH_INVALID_PROJECT_AND_DESCRIPTION
+        }
+    }
 }
 
 data class SimpleTogglUserEntryReport(
@@ -25,3 +42,9 @@ data class SimpleTogglUserEntryReport(
     override val reportUrl: String,
     override val workTime: Duration,
 ) : TogglUserEntryReport
+
+enum class ReportErrorType {
+    ENTRIES_WITH_INVALID_PROJECT,
+    ENTRIES_WITH_INVALID_DESCRIPTION,
+    ENTRIES_WITH_INVALID_PROJECT_AND_DESCRIPTION,
+}

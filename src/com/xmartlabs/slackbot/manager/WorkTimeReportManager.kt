@@ -178,7 +178,7 @@ object WorkTimeReportManager {
             untrackedTime = togglReport.wrongFormatTrackedTime,
             from = from,
             to = to,
-            reportUrl = togglReport.reportUrl,
+            report = togglReport,
         )
         UserSlackRepository.sendMessage(slackUser, message)
         logger.debug("Send toggle message to ${togglReport.togglUser.email}: $message")

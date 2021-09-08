@@ -11,15 +11,13 @@ sealed interface TogglUserEntryReport {
 
 data class FullTogglUserEntryReport(
     override val togglUser: TogglUser,
-    val entries: List<TimeEntry>,
+    override val workTime: Duration,
     override val reportUrl: String,
+    val wrongFormatEntries: List<TimeEntry>,
     val reportInvalidProjectsUrl: String,
     val reportInvalidEntryDescriptionsUrl: String,
 ) : TogglUserEntryReport {
-    val wrongFormatEntries: List<TimeEntry> =
-        entries.filter { (it.projectId ?: 0L) == 0L || it.description.isNullOrBlank() }
     val wrongFormatTrackedTime: Duration = Duration.ofMillis(wrongFormatEntries.sumOf { it.duration })
-    override val workTime: Duration = Duration.ofMillis(entries.sumOf { it.duration })
 
     val reportErrorType: ReportErrorType? by lazy {
         val entriesWithWrongProject = wrongFormatEntries.filter { (it.projectId ?: 0L) == 0L }.toSet()

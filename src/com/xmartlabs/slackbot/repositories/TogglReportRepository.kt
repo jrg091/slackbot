@@ -22,12 +22,13 @@ object TogglReportRepository {
         excludeActiveEntries: Boolean = Config.TOGGL_EXCLUDE_ACTIVE_ENTRIES,
     ): List<FullTogglUserEntryReport> = coroutineScope {
         kotlin.runCatching {
-            val tasksWithoutProjects = async {
-                TogglReportsRemoteSource.getTasks(since, until)
+            val invalidEntries = async {
+                TogglReportsRemoteSource.getInvalidTasks(since, until)
             }
             val togglUsers = UserTogglRemoteSource.getTogglUsers()
                 .associateBy { it.userId }
-            tasksWithoutProjects.await()
+            val userWorkTime = getUserWorkTime(since.toLocalDate(), until.toLocalDate())
+            invalidEntries.await()
                 .filter { if (excludeActiveEntries) it.end != null else true }
                 .groupBy { it.userId }
                 .toList()
@@ -35,7 +36,8 @@ object TogglReportRepository {
                     val user = togglUsers[id]!!
                     FullTogglUserEntryReport(
                         togglUser = user,
-                        entries = entries,
+                        workTime = userWorkTime.getOrDefault(user.userId, Duration.ZERO),
+                        wrongFormatEntries = entries,
                         reportUrl = TogglReportsRemoteSource.generateReportUrl(
                             user, since.toLocalDate(), until.toLocalDate()
                         ),
@@ -56,16 +58,9 @@ object TogglReportRepository {
         until: LocalDate,
     ): List<SimpleTogglUserEntryReport> = coroutineScope {
         kotlin.runCatching {
-            val entriesSummaryDeferred = async {
-                UserTogglRemoteSource.getTogglUserSummary(since, until, ToggleSummarySubGroupType.PROJECT)
-            }
-            val togglUsers = UserTogglRemoteSource.getTogglUsers()
-
-            val userTime: Map<Long, Duration> = entriesSummaryDeferred.await()
-                .groups
-                .associateBy { it.id.toLong() }
-                .mapValues { (_, entries) -> Duration.ofSeconds(entries.subGroups.sumOf { it.seconds ?: 0 }.toLong()) }
-            togglUsers
+            val togglUsers = async { UserTogglRemoteSource.getTogglUsers() }
+            val userTime: Map<Long, Duration> = getUserWorkTime(since, until)
+            togglUsers.await()
                 .map { user ->
                     SimpleTogglUserEntryReport(
                         togglUser = user,
@@ -76,4 +71,12 @@ object TogglReportRepository {
         }.onFailure { logger.error("Error fetching toggl data", it) }
             .getOrNull() ?: listOf()
     }
+
+    private suspend fun getUserWorkTime(
+        since: LocalDate,
+        until: LocalDate,
+    ): Map<Long, Duration> = UserTogglRemoteSource.getTogglUserSummary(since, until, ToggleSummarySubGroupType.PROJECT)
+        .groups
+        .associateBy { it.id.toLong() }
+        .mapValues { (_, entries) -> Duration.ofSeconds(entries.subGroups.sumOf { it.seconds ?: 0 }) }
 }

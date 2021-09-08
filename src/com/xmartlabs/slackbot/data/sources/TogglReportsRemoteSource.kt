@@ -28,4 +28,18 @@ object TogglReportsRemoteSource {
             .until(until)
         return FetchAllDetailed.getAll(userWithoutProjects)
     }
+
+    fun getInvalidTasks(since: LocalDateTime, until: LocalDateTime): List<TimeEntry> {
+        val entriesWithoutDescription = TogglApi.togglReportApi.detailed()
+            .since(since)
+            .until(until)
+            .withoutDescription(true)
+        val entriesWithoutProject = TogglApi.togglReportApi.detailed()
+            .since(since)
+            .until(until)
+            .projectIds("0")
+        return (FetchAllDetailed.getAll(entriesWithoutDescription) + FetchAllDetailed.getAll(entriesWithoutProject))
+            .distinct()
+            .sortedBy { it.start }
+    }
 }

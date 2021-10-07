@@ -10,7 +10,7 @@ import com.xmartlabs.slackbot.Config
 import com.xmartlabs.slackbot.TextCommand
 import com.xmartlabs.slackbot.extensions.logIfError
 import com.xmartlabs.slackbot.manager.CommandManager
-import com.xmartlabs.slackbot.repositories.UserSlackRepository
+import com.xmartlabs.slackbot.repositories.SlackUserRepository
 import com.xmartlabs.slackbot.view.XlBotCommandsViewCreator
 
 class TextCommandActionHandler(private val command: TextCommand) : BlockActionHandler {
@@ -33,7 +33,7 @@ class TextCommandActionHandler(private val command: TextCommand) : BlockActionHa
             val appHomeView = XlBotCommandsViewCreator.createHomeView(
                 ctx = ctx,
                 userId = user,
-                isAdmin = UserSlackRepository.hasAdminPrivileges(user),
+                isAdmin = SlackUserRepository.hasAdminPrivileges(user),
                 commandsWithAssociatedAction = CommandManager.commands,
                 selectedCommand = command
             )

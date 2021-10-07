@@ -42,10 +42,7 @@ object Config {
     val TOGGL_REPORTS_SLACK_CHANNEL_ID = System.getenv("TOGGL_REPORTS_SLACK_CHANNEL_ID") ?: ""
 
     // MONDAY, WEDNESDAY, FRIDAY
-    val TOGGL_DAYS_TO_REMIND = (System.getenv("TOGGL_DAYS_TO_REMIND") ?: "2,3")
-        .split(",")
-        .map(String::toInt)
-        .map(DayOfWeek::of)
+    val TOGGL_DAYS_TO_REMIND = (System.getenv("TOGGL_DAYS_TO_REMIND") ?: "2,3").toWeekDays()
     val TOGGL_TIME_TO_REMIND: LocalTime = (System.getenv("TOGGL_TIME_TO_REMIND") ?: "11:00:00-03:00")
         .let { OffsetTime.parse(it).toLocalTime() }
     val TOGGL_EXCLUDE_ACTIVE_ENTRIES = System.getenv("TOGGL_EXCLUDE_ACTIVE_ENTRIES")?.toBoolean() ?: true
@@ -58,6 +55,13 @@ object Config {
     val TOGGL_MONTHLY_REPORT_MIN_UNTRACKED_DURATION_TO_NOTIFY: Duration =
         (System.getenv("TOGGL_MONTHLY_REPORT_MIN_UNTRACKED_DURATION_TO_NOTIFY") ?: "00:10:00")
             .toDuration()
+    val BAMBOO_DAYS_TO_REMIND: List<DayOfWeek> = (System.getenv("BAMBOO_DAYS_TO_REMIND") ?: "4").toWeekDays()
+    val BAMBOO_TIME_TO_REMIND: LocalTime = (System.getenv("BAMBOO_TIME_TO_REMIND") ?: "11:00:00-03:00")
+        .let { OffsetTime.parse(it).toLocalTime() }
+    val BAMBOO_REMINDERS_ENABLED = System.getenv("BAMBOO_REMINDERS_ENABLED")?.toBoolean() ?: true
+    val BAMBOO_REMINDERS_INCLUDE_MISSING_FIELD_IN_REPORT =
+        System.getenv("BAMBOO_REMINDERS_INCLUDE_MISSING_FIELD_IN_REPORT")?.toBoolean() ?: false
+    val DEPARTMENTS_WITH_GITHUB_ACCOUNTS = listOf("Development", "PM", "DevOps")
 
     init {
         // Check slack keys
@@ -69,8 +73,12 @@ object Config {
         }
     }
 
-    private fun String.toDuration() = Duration.between(
+    private fun String.toDuration(): Duration = Duration.between(
         LocalTime.MIN,
         LocalTime.parse(this)
     )
+
+    private fun String.toWeekDays(): List<DayOfWeek> = split(",")
+        .map(String::toInt)
+        .map(DayOfWeek::of)
 }

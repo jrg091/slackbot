@@ -7,7 +7,7 @@ import com.slack.api.bolt.response.Response
 import com.slack.api.model.kotlin_extension.block.withBlocks
 import com.xmartlabs.slackbot.Config
 import com.xmartlabs.slackbot.model.DmAnnouncementRequest
-import com.xmartlabs.slackbot.repositories.UserSlackRepository
+import com.xmartlabs.slackbot.repositories.SlackUserRepository
 import com.xmartlabs.slackbot.view.AnnouncementViewCreator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -39,7 +39,7 @@ class AnnouncementConfirmationViewSubmissionHandler : ViewSubmissionHandler {
             val announcementToSend = AnnouncementViewCreator.createAnnouncement(announcement)
             channelsToSend
                 .forEach { userId ->
-                    UserSlackRepository.sendMessage(
+                    SlackUserRepository.sendMessage(
                         userId,
                         "`:loudspeaker: Announcement from: <@${announcement.requester}>`",
                         announcementToSend
@@ -49,7 +49,7 @@ class AnnouncementConfirmationViewSubmissionHandler : ViewSubmissionHandler {
                 }
             if (usersWithError.isNotEmpty()) {
                 ctx.logger.error("Message was not sent to. $usersWithError")
-                UserSlackRepository.sendMessage(
+                SlackUserRepository.sendMessage(
                     announcerUserId,
                     "Message couldn't be sent to some users.",
                     withBlocks {
@@ -62,7 +62,7 @@ class AnnouncementConfirmationViewSubmissionHandler : ViewSubmissionHandler {
                     } + announcementToSend
                 )
             } else {
-                UserSlackRepository.sendMessage(
+                SlackUserRepository.sendMessage(
                     announcerUserId,
                     "Announcement was sent!",
                     withBlocks { section { markdownText("Announcement was sent!\nAnnouncement:\n") } } +
@@ -70,7 +70,7 @@ class AnnouncementConfirmationViewSubmissionHandler : ViewSubmissionHandler {
                 )
             }
         } else {
-            UserSlackRepository.sendMessage(
+            SlackUserRepository.sendMessage(
                 announcerUserId,
                 "Announcements are not enabled",
             )

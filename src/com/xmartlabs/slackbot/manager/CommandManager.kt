@@ -10,7 +10,7 @@ import com.xmartlabs.slackbot.Command
 import com.xmartlabs.slackbot.Config
 import com.xmartlabs.slackbot.TextCommand
 import com.xmartlabs.slackbot.buttonActionId
-import com.xmartlabs.slackbot.repositories.UserSlackRepository
+import com.xmartlabs.slackbot.repositories.SlackUserRepository
 
 @Suppress("MaxLineLength")
 object CommandManager {
@@ -290,4 +290,4 @@ private fun getMembersFromCommandText(peopleCommandText: String?): List<String>?
         ?.split("@")
         ?.map(String::trim)
         ?.filterNot(String::isBlank)
-        ?.let { UserSlackRepository.toUserId(it) }
+        ?.let { SlackUserRepository.toUserId(it) }

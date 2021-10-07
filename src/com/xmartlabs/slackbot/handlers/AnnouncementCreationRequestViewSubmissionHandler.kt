@@ -7,8 +7,8 @@ import com.slack.api.bolt.response.Response
 import com.xmartlabs.slackbot.Config
 import com.xmartlabs.slackbot.extensions.MessageHelper
 import com.xmartlabs.slackbot.model.FilterMode
-import com.xmartlabs.slackbot.repositories.ConversationSlackRepository
-import com.xmartlabs.slackbot.repositories.UserSlackRepository
+import com.xmartlabs.slackbot.repositories.SlackConversationRepository
+import com.xmartlabs.slackbot.repositories.SlackUserRepository
 import com.xmartlabs.slackbot.view.AnnouncementViewCreator
 
 class AnnouncementCreationRequestViewSubmissionHandler : ViewSubmissionHandler {
@@ -16,16 +16,16 @@ class AnnouncementCreationRequestViewSubmissionHandler : ViewSubmissionHandler {
         val announcementRequestFromPayload =
             AnnouncementViewCreator.getDmAnnouncementRequestFromPayload(viewSubmissionRequest.payload, ctx)
         // Return the ack here because otherwise a time out could be generated
-        val users = UserSlackRepository.getActiveUsers()
+        val users = SlackUserRepository.getActiveUsers()
         val normalizedAnnouncement = announcementRequestFromPayload.copy(
             details = MessageHelper.normalizeMessage(
                 message = announcementRequestFromPayload.details,
                 usersCallback = { users },
-                conversationsCallback = { ConversationSlackRepository.getRemoteEntities() }
+                conversationsCallback = { SlackConversationRepository.getRemoteEntities() }
             )
         )
         val channel = announcementRequestFromPayload.announceInChannel
-            ?.let { ConversationSlackRepository.getChannel(it) }
+            ?.let { SlackConversationRepository.getChannel(it) }
         ctx.logger.debug("channel ${announcementRequestFromPayload.announceInChannel} $channel")
         ctx.logger.debug("payload ${viewSubmissionRequest.payload}")
         if (channel?.isMember == false && channel.isPrivate) {
@@ -39,7 +39,7 @@ class AnnouncementCreationRequestViewSubmissionHandler : ViewSubmissionHandler {
         }
 
         val announcerUserId = viewSubmissionRequest.payload.user.id
-        val announcerUser = UserSlackRepository.getUser(announcerUserId)
+        val announcerUser = SlackUserRepository.getUser(announcerUserId)
         require(!Config.ANNOUNCEMENTS_PROTECTED_FEATURE ||
                 announcerUser?.isAdmin == true ||
                 announcerUserId in Config.USERS_WITH_ADMIN_PRIVILEGES

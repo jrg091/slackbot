@@ -5,7 +5,7 @@ import com.slack.api.model.block.LayoutBlock
 import com.xmartlabs.slackbot.data.sources.ConversationSlackRemoteSource
 import com.xmartlabs.slackbot.data.sources.SlackRemoteSource
 
-object ConversationSlackRepository : SlackEntityRepository<Conversation>() {
+object SlackConversationRepository : SlackEntityRepository<Conversation>() {
     override val remoteSource: SlackRemoteSource<Conversation>
         get() = ConversationSlackRemoteSource
 

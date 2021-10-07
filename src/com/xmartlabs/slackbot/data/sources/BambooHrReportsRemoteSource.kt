@@ -12,16 +12,17 @@ import java.time.LocalDate
 
 object BambooHrReportsRemoteSource {
     private suspend fun getUserFields(userId: String) =
-        BamboohrApi.client.get<BambooHrUserCustomFields>(
-            "${BamboohrApi.BASE_URL}/employees/$userId/?fields=customWorkingHours,hireDate"
+        BambooHrApi.client.get<BambooHrUserCustomFields>(
+            "${BambooHrApi.BASE_URL}/employees/$userId/?fields=" +
+                    BambooHrCustomFieldsInfo.VALUES.joinToString(",")
         )
 
     suspend fun getUsers(): List<BambooUser> =
-        BamboohrApi.client.get<BambooEmployeeDirectoryResponse>("${BamboohrApi.BASE_URL}/employees/directory")
+        BambooHrApi.client.get<BambooEmployeeDirectoryResponse>("${BambooHrApi.BASE_URL}/employees/directory")
             .employees
             .mapNotNull { directoryUser ->
                 val userExtraFields = getUserFields(userId = directoryUser.id)
-                val workingHours = userExtraFields.customWorkingHours
+                val workingHours = userExtraFields.workingHours
                     ?.let { workingHours ->
                         // Some users use 30 and 40 hr and other users use 6 and 8.
                         // This should be normalized by hr
@@ -47,13 +48,14 @@ object BambooHrReportsRemoteSource {
                         displayName = directoryUser.displayName,
                         workEmail = directoryUser.workEmail,
                         workingHours = workingHours,
-                        hireDate = userExtraFields.hireDate
+                        hireDate = userExtraFields.hireDate,
+                        customFields = userExtraFields,
                     )
                 }
             }
 
     suspend fun getTimeOff(start: LocalDate, end: LocalDate) =
-        BamboohrApi.client.get<List<BambooTimeOff>>("${BamboohrApi.BASE_URL}/time_off/whos_out/?" +
+        BambooHrApi.client.get<List<BambooTimeOff>>("${BambooHrApi.BASE_URL}/time_off/whos_out/?" +
                 "start=${TogglBambooDateSerializer.formatter.format(start)}&" +
                 "end=${TogglBambooDateSerializer.formatter.format(end)}"
         )

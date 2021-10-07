@@ -4,7 +4,7 @@ import com.xmartlabs.slackbot.Config
 import com.xmartlabs.slackbot.extensions.toPrettyString
 import com.xmartlabs.slackbot.logger
 import com.xmartlabs.slackbot.manager.MessageManager
-import com.xmartlabs.slackbot.repositories.ConversationSlackRepository
+import com.xmartlabs.slackbot.repositories.SlackConversationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -51,8 +51,8 @@ class SendWelcomeMessageUseCase : CoroutineUseCase<SendWelcomeMessageUseCase.Par
         // The check is done to avoid multiple messages when the system is shouting down
         if (newUsers.isNotEmpty()) {
             val welcomeMessage = MessageManager.getOngoardingMessage(Config.BOT_USER_ID, newUsers.toList())
-            ConversationSlackRepository.sendMessage(Config.WELCOME_CHANNEL_ID, welcomeMessage)
-            ConversationSlackRepository.getChannels().find { it.name == Config.WELCOME_CHANNEL_ID }
+            SlackConversationRepository.sendMessage(Config.WELCOME_CHANNEL_ID, welcomeMessage)
+            SlackConversationRepository.getChannels().find { it.name == Config.WELCOME_CHANNEL_ID }
             logger.info("Send welcome to $newUsers")
             newUsers.clear()
         }

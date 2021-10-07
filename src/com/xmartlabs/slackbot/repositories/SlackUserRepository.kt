@@ -8,7 +8,7 @@ import com.xmartlabs.slackbot.data.sources.SlackRemoteSource
 import com.xmartlabs.slackbot.data.sources.UserSlackRemoteSource
 import com.xmartlabs.slackbot.logger
 
-object UserSlackRepository : SlackEntityRepository<User>() {
+object SlackUserRepository : SlackEntityRepository<User>() {
     private const val SLACKBOT_UID = "USLACKBOT"
 
     override val remoteSource: SlackRemoteSource<User>

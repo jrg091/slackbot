@@ -2,7 +2,6 @@ package com.xmartlabs.slackbot.manager
 
 import com.slack.api.model.User
 import com.xmartlabs.slackbot.Config
-import com.xmartlabs.slackbot.data.sources.BambooHrReportsRemoteSource
 import com.xmartlabs.slackbot.extensions.isWorkDay
 import com.xmartlabs.slackbot.extensions.max
 import com.xmartlabs.slackbot.extensions.min
@@ -17,9 +16,10 @@ import com.xmartlabs.slackbot.model.BambooWorkTimeReport
 import com.xmartlabs.slackbot.model.FullTogglUserEntryReport
 import com.xmartlabs.slackbot.model.SimpleTogglUserEntryReport
 import com.xmartlabs.slackbot.model.TogglUserEntryReport
-import com.xmartlabs.slackbot.repositories.ConversationSlackRepository
+import com.xmartlabs.slackbot.repositories.BambooUserRepository
+import com.xmartlabs.slackbot.repositories.SlackConversationRepository
+import com.xmartlabs.slackbot.repositories.SlackUserRepository
 import com.xmartlabs.slackbot.repositories.TogglReportRepository
-import com.xmartlabs.slackbot.repositories.UserSlackRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -53,7 +53,7 @@ object WorkTimeReportManager {
             val toFormatted = toDate.format(MessageManager.LOCAL_DATE_FORMATTER)
             val message = "Report from $fromFormatted to $toFormatted \n$report"
             logger.info(message)
-            ConversationSlackRepository.sendCsvFile(
+            SlackConversationRepository.sendCsvFile(
                 channelId = notifyUserId,
                 fileName = "report_${fromDate.toRegularFormat()}_${toDate.toRegularFormat()}",
                 title = "Report from $fromFormatted to $toFormatted",
@@ -61,7 +61,7 @@ object WorkTimeReportManager {
             )
         }.onFailure {
             logger.error("Error sending time report", it)
-            ConversationSlackRepository.sendMessage(
+            SlackConversationRepository.sendMessage(
                 channelId = notifyUserId,
                 text = "Error Generating Report. Error: ${it.toPrettyString()}"
             )
@@ -98,7 +98,7 @@ object WorkTimeReportManager {
                     .associateBy { it.bambooUser.workEmail }
             }
         val usersDeferred = async {
-            UserSlackRepository.getUsers()
+            SlackUserRepository.getUsers()
                 .associateBy { it.profile.email }
         }
         val togglReportDeferred: Deferred<List<ToggleReport>> = async {
@@ -138,8 +138,8 @@ object WorkTimeReportManager {
 
     private suspend fun getBambooReport(from: LocalDate, to: LocalDate): List<BambooWorkTimeReport> = coroutineScope {
         require(!from.isAfter(to))
-        val usersDeferred = async { BambooHrReportsRemoteSource.getUsers() }
-        val timeOffDeferred = async { BambooHrReportsRemoteSource.getTimeOff(from, to) }
+        val usersDeferred = async { BambooUserRepository.getUsers() }
+        val timeOffDeferred = async { BambooUserRepository.getTimeOff(from, to) }
         (usersDeferred.await() to timeOffDeferred.await())
             .let { (users, timeOffs) ->
                 val timeOffMap: Map<String?, List<BambooTimeOff>> = timeOffs.groupBy { it.employeeId }
@@ -180,7 +180,7 @@ object WorkTimeReportManager {
             to = to,
             report = togglReport,
         )
-        UserSlackRepository.sendMessage(slackUser, message)
+        SlackUserRepository.sendMessage(slackUser, message)
         logger.debug("Send toggle message to ${togglReport.togglUser.email}: $message")
     }
 
@@ -204,7 +204,7 @@ object WorkTimeReportManager {
             val message = "*Toggl report sent to:* :toggl_on: \n" +
                     "$entriesMessage\n\n$reportGeneratedInfo in $reportDuration"
             logger.info(message)
-            ConversationSlackRepository.sendMessage(
+            SlackConversationRepository.sendMessage(
                 Config.TOGGL_REPORTS_SLACK_CHANNEL_ID,
                 message
             )

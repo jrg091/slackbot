@@ -16,8 +16,9 @@ import com.xmartlabs.slackbot.handlers.TextCommandActionHandler
 import com.xmartlabs.slackbot.handlers.TogglReportSlashCommandHandler
 import com.xmartlabs.slackbot.handlers.TogglReportViewSubmissionHandler
 import com.xmartlabs.slackbot.manager.CommandManager
-import com.xmartlabs.slackbot.repositories.ConversationSlackRepository
-import com.xmartlabs.slackbot.repositories.UserSlackRepository
+import com.xmartlabs.slackbot.repositories.SlackConversationRepository
+import com.xmartlabs.slackbot.repositories.SlackUserRepository
+import com.xmartlabs.slackbot.usecases.RemindInvalidBambooHrUserDataUseCase
 import com.xmartlabs.slackbot.usecases.RemindInvalidEntryTogglUseCase
 import com.xmartlabs.slackbot.view.AnnouncementViewCreator
 import com.xmartlabs.slackbot.view.TogglReportViewCreator
@@ -39,6 +40,7 @@ fun main() {
     handleMemberJoinedChannelEvent(app)
     handleAppOpenedEvent(app)
     handleViews(app)
+    setupBambooReminders()
     setupTooglReminders()
     prefetchData()
     val server = SlackAppServer(app, "/slack/events", Config.PORT)
@@ -48,10 +50,23 @@ fun main() {
 fun prefetchData() {
     GlobalScope.launch(Dispatchers.IO) {
         kotlin.runCatching {
-            ConversationSlackRepository.reloadCache()
-            UserSlackRepository.reloadCache()
+            SlackConversationRepository.reloadCache()
+            SlackUserRepository.reloadCache()
         }
             .onFailure { logger.error("Error preloading data", it) }
+    }
+}
+
+fun setupBambooReminders() {
+    if (Config.BAMBOO_REMINDERS_ENABLED) {
+        GlobalScope.launch(Dispatchers.IO) {
+            kotlin.runCatching {
+                RemindInvalidBambooHrUserDataUseCase().execute(RemindInvalidBambooHrUserDataUseCase.Param)
+            }
+                .onFailure { logger.error("Error sending bamboo reminders", it) }
+        }
+    } else {
+        logger.info("Bamboo reports are not enabled")
     }
 }
 

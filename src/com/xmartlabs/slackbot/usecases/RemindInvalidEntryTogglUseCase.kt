@@ -1,6 +1,7 @@
 package com.xmartlabs.slackbot.usecases
 
 import com.xmartlabs.slackbot.Config
+import com.xmartlabs.slackbot.extensions.TimeHelper
 import com.xmartlabs.slackbot.extensions.isLastWorkingDayOfTheMonth
 import com.xmartlabs.slackbot.extensions.toLastWorkingDayOfTheMonth
 import com.xmartlabs.slackbot.logger
@@ -77,21 +78,8 @@ class RemindInvalidEntryTogglUseCase : CoroutineUseCase<RemindInvalidEntryTogglU
         }
     }
 
-    private fun durationToNextWeeklyReminder(): Duration {
-        val now = LocalDateTime.now()
-
-        val sendTime = Config.TOGGL_TIME_TO_REMIND
-        return if (now.dayOfWeek in Config.TOGGL_DAYS_TO_REMIND && now.toLocalTime() < sendTime) {
-            Duration.between(now.toLocalTime(), sendTime)
-        } else {
-            var nextDay = LocalDate.now()
-                .plusDays(1)
-            while (nextDay.dayOfWeek !in Config.TOGGL_DAYS_TO_REMIND) {
-                nextDay = nextDay.plusDays(1)
-            }
-            Duration.between(now, nextDay.atTime(sendTime))
-        }
-    }
+    private fun durationToNextWeeklyReminder(): Duration =
+        TimeHelper.durationToNextAvailableDate(Config.TOGGL_TIME_TO_REMIND, Config.TOGGL_DAYS_TO_REMIND)
 
     private val LocalDate.reportType: ReportPeriodType
         get() = if (isLastWorkingDayOfTheMonth()) ReportPeriodType.MONTHLY else ReportPeriodType.WEEKLY

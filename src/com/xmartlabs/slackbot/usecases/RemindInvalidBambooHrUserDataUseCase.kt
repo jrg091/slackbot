@@ -89,7 +89,7 @@ class RemindInvalidBambooHrUserDataUseCase : CoroutineUseCase<RemindInvalidBambo
     private fun calculateMissingRequiredFields(user: BambooUser) = buildList {
         with(user.customFields) {
             if (isPhotoUploaded == false) add("Picture")
-            if (birthday.isNullOrBlank()) add("Birthday")
+            if (birthday == null) add("Birthday")
             if (ci.isNullOrBlank()) add("CI")
             if (address.isNullOrBlank()) add("Address")
             if (mobilePhone.isNullOrBlank()) add("Mobile Phone")

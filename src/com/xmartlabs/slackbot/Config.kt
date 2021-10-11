@@ -62,6 +62,7 @@ object Config {
     val BAMBOO_REMINDERS_INCLUDE_MISSING_FIELD_IN_REPORT =
         System.getenv("BAMBOO_REMINDERS_INCLUDE_MISSING_FIELD_IN_REPORT")?.toBoolean() ?: false
     val DEPARTMENTS_WITH_GITHUB_ACCOUNTS = listOf("Development", "PM", "DevOps")
+    val PROFILE_COMMAND_ENABLED = System.getenv("PROFILE_COMMAND_ENABLED")?.toBoolean() ?: true
 
     init {
         // Check slack keys

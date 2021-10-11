@@ -1,17 +1,20 @@
 @file:Suppress("TooManyFunctions")
+
 package com.xmartlabs.slackbot.extensions
 
 import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDate
+import java.time.Period
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
+import kotlin.math.abs
 import kotlin.math.absoluteValue
 
-fun Duration.toPrettyString(includeSeconds: Boolean = false): String {
+fun Duration.toPrettyString(fullMode: Boolean = false): String {
     val parts: MutableList<String> = ArrayList()
     val days = toDaysPart()
     if (days > 0) {
@@ -25,11 +28,28 @@ fun Duration.toPrettyString(includeSeconds: Boolean = false): String {
     if (minutes > 0 || parts.isNotEmpty()) {
         parts.add(plural(minutes.toLong(), "minute"))
     }
-    if (includeSeconds) {
+    if (fullMode) {
         val seconds = toSecondsPart()
         parts.add(plural(seconds.toLong(), "second"))
     }
-    return java.lang.String.join(", ", parts)
+    return parts.joinToString(", ")
+}
+
+fun Period.toPrettyString(fullMode: Boolean = false): String {
+    val parts: MutableList<String> = ArrayList()
+    val years: Int = abs(years)
+    if (years > 0) {
+        parts.add(plural(years.toLong(), "year"))
+    }
+    val months: Int = abs(months)
+    if (months > 0 && (fullMode || parts.isEmpty())) {
+        parts.add(plural(months.toLong(), "month"))
+    }
+    val days: Int = abs(days)
+    if (days > 0 && (fullMode || parts.isEmpty())) {
+        parts.add(plural(days.toLong(), "day"))
+    }
+    return parts.joinToString(", ")
 }
 
 private fun plural(num: Long, unit: String): String {

@@ -27,7 +27,8 @@ data class BambooHrUserCustomFields(
     @SerialName(BambooHrCustomFieldsInfo.ADDRESS_FIELD_ID)
     val address: String? = null,
     @SerialName(BambooHrCustomFieldsInfo.DATE_OF_BIRTH_FIELD_ID)
-    val birthday: String? = null,
+    @Serializable(with = TogglBambooDateSerializer::class)
+    val birthday: LocalDate? = null,
     @SerialName(BambooHrCustomFieldsInfo.CI_FIELD_ID)
     val ci: String? = null,
     @SerialName(BambooHrCustomFieldsInfo.DEPARTMENT_FIELD_FIELD_ID)

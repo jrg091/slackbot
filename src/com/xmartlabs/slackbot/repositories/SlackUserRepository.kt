@@ -27,7 +27,7 @@ object SlackUserRepository : SlackEntityRepository<User>() {
     fun getUser(userId: String) = getEntity { it.id == userId }
 
     @Synchronized
-    fun toUserId(membersNames: List<String>?): List<String> {
+    fun getUsersFromNames(membersNames: List<String>?): List<User> {
         if (membersNames.isNullOrEmpty()) return emptyList()
 
         val users by lazy { getAndCacheRemoteEntities() }
@@ -37,11 +37,10 @@ object SlackUserRepository : SlackEntityRepository<User>() {
                 cachedEntities.firstOrNull { it.name.equals(memberName, true) }
                     ?: users.firstOrNull { it.name.equals(memberName, true) }
             }
-            .map { it.id }
     }
 
-    fun toUserId(userName: String): String? =
-        toUserId(listOf(userName)).firstOrNull()
+    fun getUserFromName(userName: String): User? =
+        getUsersFromNames(listOf(userName)).firstOrNull()
             .also { if (it == null) logger.warn("User not found $userName") }
 
     suspend fun sendMessage(user: User, text: String, blocks: List<LayoutBlock>? = null) =

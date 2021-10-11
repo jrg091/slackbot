@@ -11,6 +11,7 @@ import com.xmartlabs.slackbot.handlers.AppHomeOpenedEventEventHandler
 import com.xmartlabs.slackbot.handlers.CreateAnnouncementGlobalShortcutHandler
 import com.xmartlabs.slackbot.handlers.MemberJoinedChannelEventHandler
 import com.xmartlabs.slackbot.handlers.OnboardingSlashCommandHandler
+import com.xmartlabs.slackbot.handlers.ProcessGetUserInfoCommandHandler
 import com.xmartlabs.slackbot.handlers.ProcessXlBotHelpCommandCommandHandler
 import com.xmartlabs.slackbot.handlers.TextCommandActionHandler
 import com.xmartlabs.slackbot.handlers.TogglReportSlashCommandHandler
@@ -34,6 +35,7 @@ fun main() {
     val app = App()
         .command("/xlbot", ProcessXlBotHelpCommandCommandHandler(visibleInChannel = false))
         .command("/xlbot-visible", ProcessXlBotHelpCommandCommandHandler(visibleInChannel = true))
+        .command("/profile", ProcessGetUserInfoCommandHandler())
         .command("/onboarding", OnboardingSlashCommandHandler())
         .command("/toggl-report", TogglReportSlashCommandHandler())
 

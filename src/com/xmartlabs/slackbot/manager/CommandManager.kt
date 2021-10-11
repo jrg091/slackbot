@@ -290,4 +290,4 @@ private fun getMembersFromCommandText(peopleCommandText: String?): List<String>?
         ?.split("@")
         ?.map(String::trim)
         ?.filterNot(String::isBlank)
-        ?.let { SlackUserRepository.toUserId(it) }
+        ?.let { userName -> SlackUserRepository.getUsersFromNames(userName).map { it.id } }

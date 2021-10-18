@@ -9,6 +9,7 @@ import com.xmartlabs.slackbot.ActionCommand
 import com.xmartlabs.slackbot.Command
 import com.xmartlabs.slackbot.Config
 import com.xmartlabs.slackbot.TextCommand
+import com.xmartlabs.slackbot.UrlActionCommand
 import com.xmartlabs.slackbot.buttonActionId
 import com.xmartlabs.slackbot.repositories.SlackUserRepository
 
@@ -44,10 +45,11 @@ object CommandManager {
                     • A fin de mes se hace un festejo para todos los cumpleañeros! La empresa compra tortas, bebidas y algo para picar. :birthday: :pizza:
                 """.trimIndent()
         },
-        TextCommand(
+        UrlActionCommand(
             "calendar",
             title = "Calendars setup :calendar:",
             description = "Who is in PTO? When is the next lightning talk? :calendar:",
+            url = "https://www.notion.so/xmartlabs/Setup-Calendars-URLs-40a4c5506a03429dbdccea169646a8a3"
         ) { _, _ ->
             """
 
@@ -169,6 +171,18 @@ object CommandManager {
                If there is anything else you want to ask, contact our amazing chef Enzo :cook:
             """.trimIndent()
         },
+        UrlActionCommand(
+            "peoplearesaying",
+            title = "People are saying :speaking_head_in_silhouette:",
+            description = "Share what you want, what happens in the corridors and upload material! (anonymously)",
+            url = "https://docs.google.com/forms/d/e/1FAIpQLSetdH0R3E5eopGQ3WRS_ukqQm67bU4BbHD0LP6bNU0BF2YBJw/viewform"
+        ) { _, _ ->
+            """
+
+                *People are saying* :speaking_head_in_silhouette:
+                    - <https://docs.google.com/forms/d/e/1FAIpQLSetdH0R3E5eopGQ3WRS_ukqQm67bU4BbHD0LP6bNU0BF2YBJw/viewform | Form Url>
+                """.trimIndent()
+        },
         TextCommand(
             "slack", "guidelines",
             title = "XmartLabs' Slack Guidelines :slack:",
@@ -272,17 +286,26 @@ object CommandManager {
         ctx: Context,
         payload: SlashCommandPayload?,
         visibleInChannel: Boolean,
-    ): SlashCommandResponse = (
+    ): SlashCommandResponse? = (
             payload?.text?.let { userKey ->
                 commands
-                    .filterIsInstance<TextCommand>()
                     .firstOrNull { command ->
-                        command.keys.any { commandKey ->
-                            userKey.sanitizeKey().contains(commandKey.sanitizeKey())
+                        when (command) {
+                            is TextCommand -> command.keys.any { commandKey ->
+                                userKey.sanitizeKey().contains(commandKey.sanitizeKey())
+                            }
+                            is ActionCommand -> userKey.sanitizeKey().contains(command.mainKey.sanitizeKey())
+                            is UrlActionCommand -> userKey.sanitizeKey().contains(command.mainKey.sanitizeKey())
                         }
                     }
             } ?: default)
-        .answerResponse(payload?.text, ctx, visibleInChannel)
+        .let { command ->
+            when (command) {
+                is ActionCommand -> null
+                is TextCommand -> command.answerResponse(payload?.text, ctx, visibleInChannel)
+                is UrlActionCommand -> command.answerResponse(payload?.text, ctx, visibleInChannel)
+            }
+        }
 }
 
 private fun getMembersFromCommandText(peopleCommandText: String?): List<String>? =

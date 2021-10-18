@@ -6,7 +6,8 @@ import com.slack.api.model.kotlin_extension.view.blocks
 import com.slack.api.model.view.View
 import com.slack.api.model.view.Views.view
 import com.xmartlabs.slackbot.Command
-import com.xmartlabs.slackbot.TextCommand
+import com.xmartlabs.slackbot.CommandWithText
+import com.xmartlabs.slackbot.UrlActionCommand
 import com.xmartlabs.slackbot.buttonActionId
 import com.xmartlabs.slackbot.manager.CommandManager
 
@@ -17,7 +18,7 @@ object XlBotCommandsViewCreator {
         ctx: Context,
         userId: String,
         isAdmin: Boolean,
-        selectedCommand: TextCommand? = null,
+        selectedCommand: CommandWithText? = null,
         commandsWithAssociatedAction: List<Command> = CommandManager.commands.filter(Command::visible),
     ): View = view { viewBuilder ->
         viewBuilder
@@ -42,11 +43,12 @@ object XlBotCommandsViewCreator {
                 }
 
                 if (selectedCommand != null) {
-                    divider()
-                    section {
-                        markdownText(
-                            selectedCommand.answerText(null, ctx)
-                        )
+                    val selectedCommandText = selectedCommand.answerText(null, ctx)
+                    if (selectedCommandText != null) {
+                        divider()
+                        section {
+                            markdownText(selectedCommandText)
+                        }
                     }
                 }
             }
@@ -65,6 +67,9 @@ object XlBotCommandsViewCreator {
                         .forEach { (_, command) ->
                             ctx.logger.debug("Adding button ${command.title}")
                             button {
+                                if (command is UrlActionCommand) {
+                                    url(command.url)
+                                }
                                 actionId(command.buttonActionId)
                                 text(command.title, emoji = true)
                                 value(command.mainKey)

@@ -6,14 +6,14 @@ import com.slack.api.bolt.handler.builtin.BlockActionHandler
 import com.slack.api.bolt.request.builtin.BlockActionRequest
 import com.slack.api.bolt.response.Response
 import com.slack.api.bolt.response.ResponseTypes
+import com.xmartlabs.slackbot.CommandWithText
 import com.xmartlabs.slackbot.Config
-import com.xmartlabs.slackbot.TextCommand
 import com.xmartlabs.slackbot.extensions.logIfError
 import com.xmartlabs.slackbot.manager.CommandManager
 import com.xmartlabs.slackbot.repositories.SlackUserRepository
 import com.xmartlabs.slackbot.view.XlBotCommandsViewCreator
 
-class TextCommandActionHandler(private val command: TextCommand) : BlockActionHandler {
+class TextCommandActionHandler(private val command: CommandWithText) : BlockActionHandler {
     override fun apply(req: BlockActionRequest, ctx: ActionContext): Response {
         val visibleInChannel =
             Config.ACTION_VALUE_VISIBLE.equals(req.payload.actions?.get(0)?.value, ignoreCase = true)

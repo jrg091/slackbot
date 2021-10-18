@@ -110,7 +110,7 @@ private fun handleViews(app: App) {
 private fun handleAppOpenedEvent(app: App) {
     app.event(AppHomeOpenedEvent::class.java, AppHomeOpenedEventEventHandler())
     CommandManager.commands
-        .filterIsInstance<TextCommand>()
+        .filterIsInstance<CommandWithText>()
         .forEach { command -> app.blockAction(command.buttonActionId, TextCommandActionHandler(command)) }
     CommandManager.adminCommands
         .filterIsInstance<ActionCommand>()

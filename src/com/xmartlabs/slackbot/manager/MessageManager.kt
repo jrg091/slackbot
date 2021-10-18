@@ -21,9 +21,10 @@ object MessageManager {
     fun getOngoardingMessage(xlBotUserId: String, newMembersIds: List<String>?): String {
         val joinedIds = newMembersIds?.joinToString(" ") { "<@$it>" }
         val peopleWithSpace = if (joinedIds.isNullOrBlank()) "" else "$joinedIds "
+        val members = English.plural("member", newMembersIds?.size ?: 0)
         return """
 
-                :agite-izq: *Team, say hi to our new team ${English.plural("member", newMembersIds?.size ?: 0)}!* :agite:
+                :agite-izq: *Team, say hi to our new team $members!* :agite:
                  ${peopleWithSpace}Hi, welcome to Xmartlabs! :wave: :xl: We are very happy for having you on board, our entire team is here to help you with whatever you need :muscle:
 
                 To know what your next steps are, <https://www.notion.so/xmartlabs/Onboarding-c092b413380341948aabffa17bd85647 | go to the onboarding page> :notion-logo:
@@ -50,7 +51,8 @@ object MessageManager {
     }
 
     private fun getReportUrlMessage(report: FullTogglUserEntryReport): String {
-        val templateMessage = "Please, take a look at <%s | yours entries>."
+        val templateMessage = "Please, take a look at <%s | your " +
+                English.plural("entry", report.wrongFormatEntries.size) + ">."
         return when (report.reportErrorType) {
             ReportErrorType.ENTRIES_WITH_INVALID_PROJECT -> templateMessage.format(report.reportInvalidProjectsUrl)
             ReportErrorType.ENTRIES_WITH_INVALID_DESCRIPTION ->
@@ -69,14 +71,17 @@ object MessageManager {
         from: LocalDate,
         to: LocalDate,
         report: FullTogglUserEntryReport,
-    ) = """
-        Hi <@$userId>, you have *${report.wrongFormatEntries.size} tracked toggl ${English.plural("entry", report.wrongFormatEntries.size)} (${untrackedTime.toPrettyString()})* with an invalid format (no project assigned or an empty description).
-        Report generated from ${from.format(LOCAL_DATE_FORMATTER)} to ${to.format(LOCAL_DATE_FORMATTER)}.
-        It's important to keep your toggl up to date.
-        ${getReportUrlMessage(report)}
-        
-        If you have any questions, you can use `/xlbot toggl` slack command.
-    """.trimIndent()
+    ): String {
+        val entries = English.plural("entry", report.wrongFormatEntries.size)
+        return """
+            Hi <@$userId>, you have *${report.wrongFormatEntries.size} tracked toggl $entries (${untrackedTime.toPrettyString()})* with an invalid format (no project assigned or an empty description).
+            Report generated from ${from.format(LOCAL_DATE_FORMATTER)} to ${to.format(LOCAL_DATE_FORMATTER)}.
+            It's important to keep your toggl up to date.
+            ${getReportUrlMessage(report)}
+            
+            If you have any questions, you can use `/xlbot toggl` slack command.
+        """.trimIndent()
+    }
 
     private fun getInvalidTogglEntriesMonthlyMessage(
         userId: String,
@@ -84,13 +89,16 @@ object MessageManager {
         from: LocalDate,
         to: LocalDate,
         report: FullTogglUserEntryReport,
-    ) = """
-        :warning::warning::warning:
-        Hi <@$userId>, *we're closing the month* and you have *${report.wrongFormatEntries.size} tracked toggl ${English.plural("entry", report.wrongFormatEntries.size)} (${untrackedTime.toPrettyString()})* with an invalid format (no project assigned or an empty description).
-        Report generated from ${from.format(LOCAL_DATE_FORMATTER)} to ${to.format(LOCAL_DATE_FORMATTER)}.
-        It's important to keep your toggl up to date.
-        ${getReportUrlMessage(report)}
-        
-        If you have any questions, you can use `/xlbot toggl` slack command.
-    """.trimIndent()
+    ): String {
+        val entries = English.plural("entry", report.wrongFormatEntries.size)
+        return """
+            :warning::warning::warning:
+            Hi <@$userId>, *we're closing the month* and you have *${report.wrongFormatEntries.size} tracked toggl $entries (${untrackedTime.toPrettyString()})* with an invalid format (no project assigned or an empty description).
+            Report generated from ${from.format(LOCAL_DATE_FORMATTER)} to ${to.format(LOCAL_DATE_FORMATTER)}.
+            It's important to keep your toggl up to date.
+            ${getReportUrlMessage(report)}
+            
+            If you have any questions, you can use `/xlbot toggl` slack command.
+        """.trimIndent()
+    }
 }

@@ -174,13 +174,25 @@ object CommandManager {
         UrlActionCommand(
             "peoplearesaying",
             title = "People are saying :speaking_head_in_silhouette:",
-            description = "Share what you want, what happens in the corridors and upload material! (anonymously)",
+            description = "Share what you want, what happens in the corridors and upload material! (anonymously) " +
+                    ":loudspeaker:",
             url = "https://docs.google.com/forms/d/e/1FAIpQLSetdH0R3E5eopGQ3WRS_ukqQm67bU4BbHD0LP6bNU0BF2YBJw/viewform"
         ) { _, _ ->
             """
 
                 *People are saying* :speaking_head_in_silhouette:
                     - <https://docs.google.com/forms/d/e/1FAIpQLSetdH0R3E5eopGQ3WRS_ukqQm67bU4BbHD0LP6bNU0BF2YBJw/viewform | Form Url>
+                """.trimIndent()
+        },
+        UrlActionCommand(
+            "shopping",
+            title = "Shopping requests :shopping_trolley:",
+            description = "If you need something fill the form! :memo:",
+            url = "https://forms.gle/z84j7JSw2YAPD3fv7"
+        ) { _, _ ->
+            """
+                *Shopping requests* :shopping_trolley:
+                    - <https://forms.gle/z84j7JSw2YAPD3fv7" | Form Url>
                 """.trimIndent()
         },
         TextCommand(

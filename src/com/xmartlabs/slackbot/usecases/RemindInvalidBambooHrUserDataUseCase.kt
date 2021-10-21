@@ -64,7 +64,7 @@ class RemindInvalidBambooHrUserDataUseCase : CoroutineUseCase<RemindInvalidBambo
         )
         appendLine()
         if (Config.BAMBOO_REMINDERS_INCLUDE_MISSING_FIELD_IN_REPORT) {
-            append("The required missing information is:")
+            appendLine("The required missing information is:")
             appendLine(missingFields.joinToString("\n") { "• $it" })
             appendLine()
             appendLine(

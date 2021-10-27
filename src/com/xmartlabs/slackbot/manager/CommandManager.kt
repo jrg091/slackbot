@@ -221,6 +221,17 @@ object CommandManager {
                All contributions are welcome! :github:
             """.trimIndent()
         },
+        UrlActionCommand(
+            "after",
+            title = "Reserve a house for an after! :tada:",
+            description = "If you are planning an team bonding activity, you can reserve a house! :tada:",
+            url = https://docs.google.com/forms/d/e/1FAIpQLSeBGDnfbiBSTMMYm27X2K6kch2G21HE3zSgedbzlJwsK4GW0A/viewform
+        ) { _, _ ->
+            """
+                *House reservation* :house:
+                    - <https://docs.google.com/forms/d/e/1FAIpQLSeBGDnfbiBSTMMYm27X2K6kch2G21HE3zSgedbzlJwsK4GW0A/viewform | Solicitud de Instalaciones de XL>
+            """.trimIndent()
+        },
     )
 
     private val default = TextCommand(

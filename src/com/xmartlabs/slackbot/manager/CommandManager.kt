@@ -188,7 +188,7 @@ object CommandManager {
             "shopping",
             title = "Shopping requests :shopping_trolley:",
             description = "If you need something fill the form! :memo:",
-            url = "https://forms.gle/z84j7JSw2YAPD3fv7"
+            url = "https://forms.gle/z84j7JSw2YAPD3fv7
         ) { _, _ ->
             """
                 *Shopping requests* :shopping_trolley:

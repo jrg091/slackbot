@@ -192,7 +192,7 @@ object CommandManager {
         ) { _, _ ->
             """
                 *Shopping requests* :shopping_trolley:
-                    - <https://forms.gle/z84j7JSw2YAPD3fv7" | Form Url>
+                    - <https://forms.gle/z84j7JSw2YAPD3fv7 | Form Url>
                 """.trimIndent()
         },
         TextCommand(

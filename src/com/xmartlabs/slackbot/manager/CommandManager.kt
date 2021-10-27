@@ -229,7 +229,7 @@ object CommandManager {
         ) { _, _ ->
             """
                 *House reservation* :house:
-                    - <https://docs.google.com/forms/d/e/1FAIpQLSeBGDnfbiBSTMMYm27X2K6kch2G21HE3zSgedbzlJwsK4GW0A/viewform | Solicitud de Instalaciones de XL>
+                    - <https://docs.google.com/forms/d/e/1FAIpQLSeBGDnfbiBSTMMYm27X2K6kch2G21HE3zSgedbzlJwsK4GW0A/viewform | Form Url>
             """.trimIndent()
         },
     )

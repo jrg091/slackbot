@@ -225,7 +225,7 @@ object CommandManager {
             "after",
             title = "Reserve a house for an after! :tada:",
             description = "If you are planning an team bonding activity, you can reserve a house! :tada:",
-            url = https://docs.google.com/forms/d/e/1FAIpQLSeBGDnfbiBSTMMYm27X2K6kch2G21HE3zSgedbzlJwsK4GW0A/viewform
+            url = "https://docs.google.com/forms/d/e/1FAIpQLSeBGDnfbiBSTMMYm27X2K6kch2G21HE3zSgedbzlJwsK4GW0A/viewform"
         ) { _, _ ->
             """
                 *House reservation* :house:

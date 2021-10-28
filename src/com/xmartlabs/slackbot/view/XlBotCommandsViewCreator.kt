@@ -36,8 +36,8 @@ object XlBotCommandsViewCreator {
 
                 if (isAdmin) {
                     divider()
-                    section {
-                        markdownText("Admin commands:")
+                    header {
+                        text("Admin commands:")
                     }
                     addCommands(CommandManager.adminCommands, ctx)
                 }

@@ -195,6 +195,17 @@ object CommandManager {
                     - <https://forms.gle/z84j7JSw2YAPD3fv7 | Form Url>
                 """.trimIndent()
         },
+        UrlActionCommand(
+            "after",
+            title = "Reserve a house for an after! :tada:",
+            description = "If you are planning an team bonding activity, you can reserve a house! :tada:",
+            url = "https://docs.google.com/forms/d/e/1FAIpQLSeBGDnfbiBSTMMYm27X2K6kch2G21HE3zSgedbzlJwsK4GW0A/viewform"
+        ) { _, _ ->
+            """
+                *House reservation* :house:
+                    - <https://docs.google.com/forms/d/e/1FAIpQLSeBGDnfbiBSTMMYm27X2K6kch2G21HE3zSgedbzlJwsK4GW0A/viewform | Form Url>
+            """.trimIndent()
+        },
         TextCommand(
             "slack", "guidelines",
             title = "XmartLabs' Slack Guidelines :slack:",
@@ -219,17 +230,6 @@ object CommandManager {
                If you want to propose a new feature you can post a message in <#${Config.BOT_FEEDBACK_CHANNEL_ID}>, open a <https://github.com/xmartlabs/slackbot/discussions | GitHub Discussion> or an <https://github.com/xmartlabs/slackbot/issues | issue>.
 
                All contributions are welcome! :github:
-            """.trimIndent()
-        },
-        UrlActionCommand(
-            "after",
-            title = "Reserve a house for an after! :tada:",
-            description = "If you are planning an team bonding activity, you can reserve a house! :tada:",
-            url = "https://docs.google.com/forms/d/e/1FAIpQLSeBGDnfbiBSTMMYm27X2K6kch2G21HE3zSgedbzlJwsK4GW0A/viewform"
-        ) { _, _ ->
-            """
-                *House reservation* :house:
-                    - <https://docs.google.com/forms/d/e/1FAIpQLSeBGDnfbiBSTMMYm27X2K6kch2G21HE3zSgedbzlJwsK4GW0A/viewform | Form Url>
             """.trimIndent()
         },
     )
